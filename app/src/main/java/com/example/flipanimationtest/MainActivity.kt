@@ -12,26 +12,25 @@ import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.databinding.DataBindingUtil
+import com.example.flipanimationtest.databinding.ActivityMainBinding
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var dataBinding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        val container = findViewById<ConstraintLayout>(R.id.container)
-        val cardView = findViewById<CardView>(R.id.card)
-        val view1 = findViewById<ConstraintLayout>(R.id.view1)
-        val view2 = findViewById<ConstraintLayout>(R.id.view2)
+        dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         var isFront = true
-        cardView.setOnClickListener {
+        dataBinding.card.setOnClickListener {
             doFlipAnimation(
                 isFrontToBack = isFront,
-                targetView = container,
+                targetView = dataBinding.container,
                 onAngle90 = {
-                    view1.visibility = if (isFront) View.GONE else View.VISIBLE
-                    view2.visibility = if (isFront) View.VISIBLE else View.GONE
+                    dataBinding.view1.visibility = if (isFront) View.GONE else View.VISIBLE
+                    dataBinding.view2.visibility = if (isFront) View.VISIBLE else View.GONE
                 },
                 onAnimationEnd = {
                     isFront = !isFront
@@ -66,7 +65,11 @@ class MainActivity : AppCompatActivity() {
             play(anim1).before(anim2)
             play(anim1).with(ObjectAnimator.ofFloat(targetView, "scaleX", 1f, 0.5f))
             play(anim2).with(ObjectAnimator.ofFloat(targetView, "scaleX", 0.5f, 1f))
-            addEndListener { onAnimationEnd?.invoke() }
+            addEndListener {
+                targetView.translationY = 0f
+                targetView.scaleX = 1f
+                onAnimationEnd?.invoke()
+            }
         }.start()
     }
 
