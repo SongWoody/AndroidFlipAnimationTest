@@ -10,10 +10,11 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
-import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import com.example.flipanimationtest.databinding.ActivityMainBinding
+import kotlin.math.abs
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,19 +25,35 @@ class MainActivity : AppCompatActivity() {
         dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         var isFront = true
-        dataBinding.card.setOnClickListener {
+        dataBinding.flipButton.setOnClickListener {
             doFlipAnimation(
                 isFrontToBack = isFront,
                 targetView = dataBinding.container,
                 onAngle90 = {
-                    dataBinding.view1.visibility = if (isFront) View.GONE else View.VISIBLE
-                    dataBinding.view2.visibility = if (isFront) View.VISIBLE else View.GONE
+                    dataBinding.view1.visibility = if (isFront) View.INVISIBLE else View.VISIBLE
+                    dataBinding.view2.visibility = if (isFront) View.VISIBLE else View.INVISIBLE
+                    dataBinding.viewPager.requestLayout()
                 },
                 onAnimationEnd = {
                     isFront = !isFront
                     Log.i("[MAIN]", "do Action")
                 }
             )
+        }
+
+        dataBinding.viewPager.apply {
+            adapter = CardPagerAdapter(listOf("card1", "card2", "card3", "card4", "card5"))
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
+            offscreenPageLimit = 3
+            CompositePageTransformer().apply {
+                addTransformer { view: View, fl: Float ->
+                    val v = 1 - abs(fl)
+                    view.scaleY = 0.7f + v * 0.3f
+                    view.translationY = abs(fl) * 20
+                }
+            }.also {
+                setPageTransformer(it)
+            }
         }
     }
 
