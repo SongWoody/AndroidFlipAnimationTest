@@ -11,6 +11,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.example.flipanimationtest.databinding.ActivityMainBinding
@@ -45,6 +46,7 @@ class MainActivity : AppCompatActivity() {
             adapter = CardPagerAdapter(listOf("card1", "card2", "card3", "card4", "card5"))
             orientation = ViewPager2.ORIENTATION_HORIZONTAL
             offscreenPageLimit = 3
+            (getChildAt(0) as? RecyclerView)?.overScrollMode = View.OVER_SCROLL_NEVER
             CompositePageTransformer().apply {
                 addTransformer { view: View, fl: Float ->
                     val v = 1 - abs(fl)
